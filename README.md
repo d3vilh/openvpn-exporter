@@ -85,7 +85,11 @@ go build -o openvpn_exporter main.go
 ## Run in Docker
 To run latest openvpn_exporter image from docker hub:
 ```shell
-docker run --interactive --tty --rm -v /home/philipp/openvpn-server/log:/etc/openvpn/log -e OVPN_STATUS_FILE=/etc/openvpn/log/openvpn-status.log -p 9176:9176/tcp --privileged d3vilh/openvpn_exporter:latest
+docker run --interactive --tty --rm \
+-v /etc/openvpn/log:/etc/openvpn/log \
+-e OVPN_STATUS_FILE=/etc/openvpn/log/openvpn-status.log \
+-p 9176:9176/tcp \
+--privileged d3vilh/openvpn_exporter:latest
 ```
 
 With Docker compose:
@@ -116,7 +120,11 @@ docker build --force-rm=true -t local/openvpn_exporter .
 Run container locally:
 
 ```shell
-docker run --interactive --tty --rm -v /etc/openvpn/log:/etc/openvpn/log -e OVPN_STATUS_FILE=/etc/openvpn/log/openvpn-status.log -p 9176:9176/tcp --privileged local/openvpn_exporter:latest
+docker run --interactive --tty --rm \
+-v /etc/openvpn/log:/etc/openvpn/log \
+-e OVPN_STATUS_FILE=/etc/openvpn/log/openvpn-status.log \
+-p 9176:9176/tcp \
+--privileged local/openvpn_exporter:latest
 ```
 
 <a href="https://www.buymeacoffee.com/d3vilh" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 51px !important;width: 217px !important;" ></a>
