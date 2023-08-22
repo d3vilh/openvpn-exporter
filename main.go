@@ -21,6 +21,7 @@ import (
 
 	"github.com/d3vilh/openvpn-exporter/exporters"
 	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/collectors"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
@@ -43,7 +44,13 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+
 	prometheus.MustRegister(exporter)
+
+	// Remove Go collector
+	prometheus.Unregister(collectors.NewGoCollector())
+	prometheus.Unregister(collectors.NewProcessCollector(collectors.ProcessCollectorOpts{}))
+	prometheus.Unregister(collectors.NewBuildInfoCollector())
 
 	http.Handle(*metricsPath, promhttp.Handler())
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
