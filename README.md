@@ -30,7 +30,7 @@ supported command line flags.
 For clients status files, the exporter generates metrics that may look
 like this:
 
-```
+```shell
 openvpn_client_auth_read_bytes_total{status_path="..."} 3.08854782e+08
 openvpn_client_post_compress_bytes_total{status_path="..."} 4.5446864e+07
 openvpn_client_post_decompress_bytes_total{status_path="..."} 2.16965355e+08
@@ -49,7 +49,7 @@ openvpn_up{status_path="..."} 1
 For server status files (both version 2 and 3), the exporter generates
 metrics that may look like this:
 
-```
+```shell
 openvpn_server_client_received_bytes_total{common_name="...",connection_time="...",real_address="...",status_path="...",username="...",virtual_address="..."} 139583
 openvpn_server_client_sent_bytes_total{common_name="...",connection_time="...",real_address="...",status_path="...",username="...",virtual_address="..."} 710764
 openvpn_server_route_last_reference_time_seconds{common_name="...",real_address="...",status_path="...",virtual_address="..."} 1.493018841e+09
@@ -62,7 +62,7 @@ openvpn_server_connected_clients 1
 
 Usage of openvpn_exporter:
 
-```sh
+```shell
   -openvpn.status_paths string
     	Paths at which OpenVPN places its status files. (default "examples/client.status,examples/server2.status,examples/server3.status")
   -web.listen-address string
@@ -75,23 +75,54 @@ Usage of openvpn_exporter:
 
 E.g:
 
-```sh
-openvpn_exporter -openvpn.status_paths /etc/openvpn/openvpn-status.log
-```
-
-## Docker
-
-### Build
 ```shell
-docker build --force-rm=true -t openvpn_exporter .
-```
-
-To use with docker you must mount your status file to `/etc/openvpn_exporter/server.status`.
-
-```sh
-docker run -p 9176:9176 \
-  -v /path/to/openvpn_server.status:/etc/openvpn_exporter/server.status \
-  d3vilh/openvpn-exporter -openvpn.status_paths /etc/openvpn_exporter/server.status
+openvpn_exporter -openvpn.status_paths /etc/openvpn/log/openvpn-status.log
 ```
 
 Metrics should be available at http://localhost:9176/metrics.
+
+## Build new binary
+To build new binary run:
+```shell
+go build -o openvpn_exporter main.go
+```
+
+## Run in Docker
+To run latest openvpn_exporter image from docker hub:
+```shell
+docker run --interactive --tty --rm -v /home/philipp/openvpn-server/log:/etc/openvpn/log -e OVPN_STATUS_FILE=/etc/openvpn/log/openvpn-status.log -p 9176:9176/tcp --privileged d3vilh/openvpn_exporter:latest
+```
+
+With Docker compose:
+```shell
+version: "3.5"
+
+services:
+    openvpn_exporter:
+       container_name: openvpn_exporter
+       image: d3vilh/openvpn_exporter:latest
+       environment:
+           - OVPN_STATUS_FILE=/etc/openvpn/log/openvpn-status.log
+       privileged: true
+       ports:
+           - "9176:9176/tcp"
+       volumes:
+           - /etc/openvpn/log:/etc/openvpn/log
+       restart: always
+```
+
+### Build new Docker Image
+To build the container locally:
+```shell
+docker build --force-rm=true -t local/openvpn_exporter .
+```
+
+### Run new Docker Image
+Run container locally:
+
+```shell
+docker run --interactive --tty --rm -v /etc/openvpn/log:/etc/openvpn/log -e OVPN_STATUS_FILE=/etc/openvpn/log/openvpn-status.log -p 9176:9176/tcp --privileged local/openvpn_exporter:latest
+```
+
+<a href="https://www.buymeacoffee.com/d3vilh" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 51px !important;width: 217px !important;" ></a>
+
