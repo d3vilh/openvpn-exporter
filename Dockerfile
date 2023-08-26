@@ -4,7 +4,7 @@ WORKDIR /opt
 COPY go.mod go.sum ./
 RUN go mod download
 COPY . .
-RUN go build -o local/openvpn_exporter main.go
+RUN env CGO_ENABLED=0 go build -o openvpn_exporter main.go
 FROM arm64v8/alpine 
 LABEL maintainer="Mr.Philipp <d3vilh@github.com>"
 EXPOSE 9176
